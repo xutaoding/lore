@@ -2,6 +2,8 @@ from .base import *
 
 DJANGO_SETTINGS_MODULE = 'rich_sight.settings.prod'
 
+DEBUG = False
+
 WSGI_APPLICATION = 'rich_sight.wsgi_prod.application'
 
 # Database
