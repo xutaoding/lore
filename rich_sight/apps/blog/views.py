@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import View
+from django.core.mail import send_mail
 from django.views.generic import ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import datetime
@@ -48,9 +49,25 @@ class PostListView(ListView):
     context_object_name = 'posts'
 
 
-class EmailPostView(View):
-    form_class = forms.EmailPostForm
+def share_post(request, post_id):
+    template_name = ''
+    sent = False
+    post = get_object_or_404(Post, id=post_id, status='published')
 
-    def post(self, request):
-        # post = get_object_or_404()
-        pass
+    if request.POST == 'POST':
+        form_email = forms.EmailPostForm(request.POST)
+
+        if form_email.is_valid():
+            data = form_email.cleaned_data
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+
+            subject = "{] ({}) recommends you reading '{}".format(data['name'], data['email'], post.title)
+            message = "Read '{}' at {}\n\n{} 's comments: {}".format(data['title'], post_url, data['name'],
+                                                                     data['comments'])
+            send_mail(subject, message, 'xxxx@aliyun.com', [data['to']])
+            sent = True
+    else:
+        form_email = forms.EmailPostForm()
+
+    return render(request, template_name, {'form': form_email, 'post': post, 'sent': sent})
+
