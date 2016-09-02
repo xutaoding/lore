@@ -14,6 +14,13 @@ class PostAdmin(admin.ModelAdmin):
 
     prepopulated_fields = {'slug': ('title',)}
 
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'post', 'created', 'active')
+    list_filter = ('updated', 'created', 'active')
+    search_fields = ('name', 'email', 'body')
+
 admin.site.register(models.Post, PostAdmin)
+admin.site.register(models.Comment, CommentAdmin)
 
 
